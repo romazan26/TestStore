@@ -9,6 +9,7 @@ import SwiftUI
 
 struct GridCellView: View {
     
+    @StateObject var vm: ViewModel
     @State private var isFavorite = false
     @State private var isPresent = false
     @State var countPosition = 0.1
@@ -59,7 +60,11 @@ struct GridCellView: View {
             Spacer()
             //MARK: - Price
             if isPresent{
-                AddInBasket(countPosition: $countPosition, isPresent: $isPresent, price: product.price)
+                AddInBasket(vm: vm,
+                            countPosition: $countPosition,
+                            isPresent: $isPresent,
+                            price: product.price,
+                            title: product.title ?? "")
                     .frame(width: 150)
             }else{
                 HStack{

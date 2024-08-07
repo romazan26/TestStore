@@ -11,6 +11,7 @@ struct ListCellView: View {
     @State private var isPresent = false
     @State private var isFavorite = false
     @State var countPosition = 0.1
+    @StateObject var vm: ViewModel
     
     let product: Product
     var body: some View {
@@ -57,7 +58,11 @@ struct ListCellView: View {
                 Spacer()
                 //MARK: - Price
                 if isPresent {
-                    AddInBasket(countPosition: $countPosition, isPresent: $isPresent, price: product.price)
+                    AddInBasket(vm: vm,
+                                countPosition: $countPosition,
+                                isPresent: $isPresent,
+                                price: product.price,
+                                title: product.title ?? "")
                 }else{
                     HStack{
                         VStack(alignment: .leading) {

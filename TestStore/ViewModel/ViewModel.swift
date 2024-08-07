@@ -15,6 +15,10 @@ final class ViewModel: ObservableObject{
     @Published var products: [Product] = []
     
     @Published var presentListOrGrid = false
+    @Published var isPresentBasket = false
+    @Published var basket: [BasketModel] = []
+    
+    @Published var simpleProduct: BasketModel = BasketModel(title: "", price: 0, count: 0, total: 0)
     
     init(){
         getProduct()
@@ -26,6 +30,20 @@ final class ViewModel: ObservableObject{
             addProduct(title: "Адруналин 0,5л", image: UIImage(resource: .image), price: 250)
             addProduct(title: "Кофе 100г", image: UIImage(resource: .product1), price: 300)
         }
+    }
+    
+    //MARK: - Delete basket
+    func deleteBasket(){
+        basket.removeAll()
+        simpleProduct = BasketModel(title: "", price: 0, count: 0, total: 0)
+    }
+    
+    //MARK: - Add product in basket
+    func addInBasket(){
+        if !simpleProduct.title.isEmpty{
+            basket.append(simpleProduct)
+        }
+        simpleProduct = BasketModel(title: "", price: 0, count: 0, total: 0)
     }
     
     //MARK: - AddProduct
