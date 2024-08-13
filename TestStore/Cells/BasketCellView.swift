@@ -8,17 +8,37 @@
 import SwiftUI
 
 struct BasketCellView: View {
-    let product: BasketModel
+    let product: Product
     var body: some View {
-        HStack {
-            Text(product.title).font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+        HStack(alignment: .top) {
+            //MARK: - Title product
+            VStack(alignment: .leading) {
+                Text("Название:").foregroundStyle(.green)
+                Text(product.title ?? "").font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/)
+            }
+            
             Spacer()
+            
             Divider()
-            Text("\(String(format: "%.0f",product.price))")
+            //MARK: - Price
+            VStack(alignment: .leading) {
+                Text("цена:").foregroundStyle(.green)
+                Text("\(String(format: "%.0f",product.price))")
+            }
+            
             Divider()
-            Text("\(String(format: "%.01f",product.count))")
+            //MARK: - count product
+            VStack(alignment: .leading) {
+                Text("кол.:").foregroundStyle(.green)
+                Text("\(String(format: "%.01f",product.countInBasket))")
+            }
+            
             Divider()
-            Text("\(String(format: "%.01f",product.total))")
+            //MARK: - Total price product
+            VStack(alignment: .leading) {
+                Text("итог:").foregroundStyle(.green)
+                Text("\(String(format: "%.01f",product.countInBasket * product.price))")
+            }
         }
         .minimumScaleFactor(0.5)
         .frame(maxWidth: .infinity)
@@ -34,5 +54,5 @@ struct BasketCellView: View {
 }
 
 #Preview {
-    BasketCellView(product: BasketModel(title: "Milk", price: 300, count: 3, total: 900))
+    BasketCellView(product: Product())
 }

@@ -9,28 +9,40 @@ import SwiftUI
 
 struct Basketview: View {
     @StateObject var vm: ViewModel
+    @Environment(\.dismiss) var dismiss
     var body: some View {
         VStack {
             HStack {
-                Text("Корзина")
-                    .font(.title)
                 
                 Spacer()
                 
-                Button("Очистить корзину") {
+                //MARK: - Delete button
+                Button(action: {
                     vm.deleteBasket()
-                }
+                    dismiss()
+                    vm.emptyBasket = true}, label: {
+                    Text("Очистить корзину").foregroundStyle(.red)
+                })
             }
+            
+            //MARK: - List product in basket
             ScrollView {
-                ForEach(vm.basket) { product in
+                ForEach(vm.productInBasket) { product in
                     BasketCellView(product: product)
                         .padding()
                 }
             }
+            HStack {
+                Text("Итого:")
+                Spacer()
+                Text(String(format: "%.01f", vm.finalPriceBascet))
+            }.font(.title)
         }
+        .navigationTitle("Корзина")
         .padding()
         .onAppear(perform: {
-            vm.addInBasket()
+            vm.getBasket()
+            vm.getFinalPrice()
         })
     }
 }

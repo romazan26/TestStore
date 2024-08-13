@@ -16,17 +16,21 @@ struct AddInBasket: View {
     
     let price: Double
     let title: String
+    let id: ObjectIdentifier
     
     var body: some View {
         ZStack {
             Color.green
             HStack {
+                //MARK: - -0.1 Button
                 Button(action: {
                     if countPosition > 0 {
                         countPosition -= 0.1
-                        vm.simpleProduct = BasketModel(title: title, price: price, count: countPosition, total: countPosition * price)
+                        vm.editeCounOfBasket(id: id, count: countPosition)
+                        
                         if countPosition == 0{
                             isPresent = false
+                            vm.editeCounOfBasket(id: id, count: countPosition)
                         }
                     }
                     
@@ -35,7 +39,10 @@ struct AddInBasket: View {
                         .foregroundStyle(.white)
                         .frame(width: 30, height: 30)
                 })
+                
                 Spacer()
+                
+                //MARK: - Title count position
                 VStack {
                     Text("\(String(format: "%.01f", countPosition)) кг")
                         .foregroundStyle(.white)
@@ -45,11 +52,13 @@ struct AddInBasket: View {
                         .foregroundStyle(.white)
                         .font(.system(size: 10))
                 }
+                
                 Spacer()
+                //MARK: - +0.1 Button
                 Button(action: {
                     if countPosition > 0 {
                         countPosition += 0.1
-                        vm.simpleProduct = BasketModel(title: title, price: price, count: countPosition, total: countPosition * price)
+                        vm.editeCounOfBasket(id: id, count: countPosition)
                     }
                     
                 }, label: {
@@ -60,14 +69,15 @@ struct AddInBasket: View {
             }.padding()
         }
         .onAppear(perform: {
-            vm.addInBasket()
-            vm.simpleProduct = BasketModel(title: title, price: price, count: countPosition, total: countPosition * price)
+            if !vm.emptyBasket{
+                vm.editeCounOfBasket(id: id, count: countPosition) 
+            }
         })
         .frame(height: 36)
         .cornerRadius(40)
     }
 }
 
-#Preview {
-    AddInBasket(vm: ViewModel(), countPosition: .constant(0.1), isPresent: .constant(true), price: 10, title: "Milk")
-}
+//#Preview {
+//    AddInBasket(vm: ViewModel(), countPosition: .constant(0.1), isPresent: .constant(true), price: 10, title: "Milk")
+//}

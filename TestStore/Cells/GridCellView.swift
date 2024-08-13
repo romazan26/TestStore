@@ -14,7 +14,8 @@ struct GridCellView: View {
     @State private var isPresent = false
     @State var countPosition = 0.1
     
-    let product: Product
+    @ObservedObject var product: Product
+    
     var body: some View {
         VStack(alignment: .leading) {
             ZStack(alignment: Alignment(horizontal: .trailing, vertical: .top)){
@@ -59,13 +60,32 @@ struct GridCellView: View {
             
             Spacer()
             //MARK: - Price
-            if isPresent{
-                AddInBasket(vm: vm,
-                            countPosition: $countPosition,
-                            isPresent: $isPresent,
-                            price: product.price,
-                            title: product.title ?? "")
+            if !vm.emptyBasket{
+                if isPresent{
+                    AddInBasket(vm: vm,
+                                countPosition: $countPosition,
+                                isPresent: $isPresent,
+                                price: product.price,
+                                title: product.title ?? "", id: product.id)
                     .frame(width: 150)
+                }else{
+                    HStack{
+                        VStack(alignment: .leading) {
+                            Text("\(String(format: "%.01f",product.price)) р/кг")
+                                .font(.system(size: 13, weight: .heavy))
+                                .foregroundStyle(.black)
+                            Text("1199,0").foregroundStyle(.gray).strikethrough()
+                        }
+                        
+                        Spacer()
+                        Button(action: {
+                            isPresent.toggle()
+                            countPosition = 0.1
+                        }, label: {
+                            BasketButtonView()
+                        })
+                    }
+                }
             }else{
                 HStack{
                     VStack(alignment: .leading) {
@@ -76,7 +96,11 @@ struct GridCellView: View {
                     }
                     
                     Spacer()
-                    Button(action: {isPresent.toggle()}, label: {
+                    Button(action: {
+                        isPresent.toggle()
+                        vm.emptyBasket = false
+                        countPosition = 0.1
+                    }, label: {
                         BasketButtonView()
                     })
                 }
@@ -86,7 +110,12 @@ struct GridCellView: View {
             
         }
         .onAppear(perform: {
-            countPosition = 0.1
+            if vm.emptyBasket {
+                isPresent = false
+            }
+            if product.countInBasket > 0 {
+                isPresent = true
+            }
         })
         .frame(width: 130, height: 238)
         .padding()

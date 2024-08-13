@@ -13,10 +13,14 @@ final class ViewModel: ObservableObject{
     let manager = CoreDataManager.instance
     
     @Published var products: [Product] = []
+    @Published var productInBasket:[Product] = []
     
     @Published var presentListOrGrid = false
-    @Published var isPresentBasket = false
-    @Published var basket: [BasketModel] = []
+
+
+    @Published var emptyBasket = false
+    
+    @Published var finalPriceBascet:Double = 0
     
     @Published var simpleProduct: BasketModel = BasketModel(title: "", price: 0, count: 0, total: 0)
     
@@ -32,19 +36,58 @@ final class ViewModel: ObservableObject{
         }
     }
     
+    //MARK: - Get basket
+    func getBasket(){
+        productInBasket.removeAll()
+        for product in products {
+            if product.countInBasket > 0 {
+                productInBasket.append(product)
+            }
+        }
+    }
+    
+    //MARK: - Get final price of basket
+    func getFinalPrice(){
+        finalPriceBascet = 0
+        if !productInBasket.isEmpty {
+            for product in productInBasket  {
+                finalPriceBascet += product.price * product.countInBasket
+            }
+        }
+    }
+    
     //MARK: - Delete basket
     func deleteBasket(){
-        basket.removeAll()
-        simpleProduct = BasketModel(title: "", price: 0, count: 0, total: 0)
+        productInBasket.removeAll()
+        let request = NSFetchRequest<Product>(entityName: "Product")
+        
+        do{
+            products = try manager.context.fetch(request)
+            for product in products {
+                product.countInBasket = 0
+            }
+        }catch let error{
+            print("Error fetching: \(error.localizedDescription)")
+        }
+        save()
+        getFinalPrice()
     }
     
     //MARK: - Add product in basket
-    func addInBasket(){
-        if !simpleProduct.title.isEmpty{
-            basket.append(simpleProduct)
+    func editeCounOfBasket(id: ObjectIdentifier, count: Double){
+        let request = NSFetchRequest<Product>(entityName: "Product")
+        
+        do{
+            products = try manager.context.fetch(request)
+            let product = products.first(where: {$0.id == id})
+            product?.countInBasket = count
+        }catch let error{
+            print("Error fetching: \(error.localizedDescription)")
         }
-        simpleProduct = BasketModel(title: "", price: 0, count: 0, total: 0)
+        save()
+        getBasket()
     }
+    
     
     //MARK: - AddProduct
     func addProduct(title: String, image: UIImage, price: Double){

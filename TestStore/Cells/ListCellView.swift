@@ -13,7 +13,7 @@ struct ListCellView: View {
     @State var countPosition = 0.1
     @StateObject var vm: ViewModel
     
-    let product: Product
+    @ObservedObject var product: Product
     var body: some View {
         HStack {
             Image(uiImage: product.image ?? .product1)
@@ -57,12 +57,28 @@ struct ListCellView: View {
                 }
                 Spacer()
                 //MARK: - Price
-                if isPresent {
-                    AddInBasket(vm: vm,
-                                countPosition: $countPosition,
-                                isPresent: $isPresent,
-                                price: product.price,
-                                title: product.title ?? "")
+                if !vm.emptyBasket{
+                    if isPresent {
+                        AddInBasket(vm: vm,
+                                    countPosition: $countPosition,
+                                    isPresent: $isPresent,
+                                    price: product.price,
+                                    title: product.title ?? "", id: product.id)
+                    }else{
+                        HStack{
+                            VStack(alignment: .leading) {
+                                Text("\(String(format: "%.01f", product.price)) р/кг")
+                                    .font(.system(size: 20, weight: .heavy))
+                                Text("1199,0").foregroundStyle(.gray).strikethrough()
+                            }
+                            Spacer()
+                            Button(action: {
+                                isPresent = true
+                                countPosition = 0.1}, label: {
+                                BasketButtonView()
+                            })
+                        }
+                    }
                 }else{
                     HStack{
                         VStack(alignment: .leading) {
@@ -72,6 +88,7 @@ struct ListCellView: View {
                         }
                         Spacer()
                         Button(action: {
+                            vm.emptyBasket = false
                             isPresent = true
                             countPosition = 0.1}, label: {
                             BasketButtonView()
@@ -80,6 +97,14 @@ struct ListCellView: View {
                 }
             }
         }
+        .onAppear(perform: {
+            if vm.emptyBasket {
+                isPresent = false
+            }
+            if product.countInBasket > 0 {
+                isPresent = true
+            }
+        })
         .padding()
         .frame(width: 375, height: 176)
     }

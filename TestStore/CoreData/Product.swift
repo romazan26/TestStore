@@ -21,6 +21,7 @@ public class Product: NSManagedObject {
     @NSManaged public var image: UIImage?
     @NSManaged public var price: Double
     @NSManaged public var title: String?
+    @NSManaged public var countInBasket: Double
 
 }
 
